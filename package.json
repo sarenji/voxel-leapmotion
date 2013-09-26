@@ -1,0 +1,15 @@
+{
+  "name": "voxel-leapmotion",
+  "version": "0.0.0",
+  "description": "Using Leap Motion with voxel.js",
+  "main": "index.js",
+  "scripts": {},
+  "repository": "",
+  "keywords": [
+    "voxel",
+    "leapmotion",
+    "leap"
+  ],
+  "author": "David Peter",
+  "license": "MIT"
+}
