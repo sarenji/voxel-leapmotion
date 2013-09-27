@@ -11,5 +11,8 @@
     "leap"
   ],
   "author": "David Peter",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "voxel-engine": "~0.18.4"
+  }
 }
