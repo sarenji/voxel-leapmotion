@@ -18,8 +18,12 @@ var game = createGame({
   // generateVoxelChunk: generator,
   // generate: voxel.generator['Checker'],
   generate: function(i, j, k) {
+    if (i < 0) i *= -1;
+    if (j < 0) j *= -1;
+    if (k < 0) k *= -1;
+    var kind = (j % roomSize !== 0 || k % roomSize === 0) ? 3 : 1;
     var number = (i % roomSize) * (j % roomSize) * (k % roomSize);
-    return number > 0 ? 0 : 1;
+    return number > 0 ? 0 : kind;
   },
   controls: { discreteFire: true }
 });
