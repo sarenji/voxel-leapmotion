@@ -13,6 +13,7 @@
   "author": "David Peter",
   "license": "MIT",
   "dependencies": {
-    "voxel-engine": "~0.18.4"
+    "voxel-engine": "~0.18.4",
+    "underscore": "~1.5.2"
   }
 }

@@ -5,7 +5,7 @@ module.exports = function(grunt) {
     browserify: {
       game: {
         files: {
-          'js/bundle.js': ['src/**/*.js']
+          'js/bundle.js': ['src/**/*.js', '../../index.js']
         }
       }
     },
@@ -20,14 +20,15 @@ module.exports = function(grunt) {
     connect: {
       game: {
         options: {
-          port: 8001,
-          keepalive: true
+          port: 8002,
+          keepalive: true,
+          base: "."
         }
       }
     },
     watch: {
       game: {
-        files: ['src/**/*.js'],
+        files: ['src/**/*.js', '../../index.js'],
         tasks: ['browserify:game']
       }
     }

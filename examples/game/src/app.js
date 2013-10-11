@@ -2,28 +2,39 @@ var createGame = require('voxel-engine');
 var texturePath = require('painterly-textures');
 var player = require('voxel-player');
 var voxel = require('voxel');
-var terrain = require('voxel-simplex-terrain');
+var controls = require('../../../');
 
-var chunkSize = 32
+var chunkSize = 16
 var chunkDistance = 2
-var generator = terrain({scaleFactor: 10, chunkDistance: chunkDistance});
-
-// the returned function is for getting specific chunks
-var chunkData = generator([0,0,0], [32,32,32]);
+var roomSize = 16
 
 var game = createGame({
-  texturePath: texturePath('./'),
-  generateVoxelChunk: generator,
-  worldOrigin: [0, 0, 0],
-  startingPosition: [0, 3000, 1000],
+  chunkSize: chunkSize,
+  chunkDistance: chunkDistance,
+  texturePath: texturePath('examples/game'),
+  // generateVoxelChunk: generator,
+  // generate: voxel.generator['Checker'],
+  generate: function(i, j, k) {
+    var number = (i % roomSize) * (j % roomSize) * (k % roomSize);
+    return number > 0 ? 0 : 1;
+  },
   controls: { discreteFire: true }
 });
+
+game.appendTo(document.body);
 
 var createPlayer = player(game);
 var avatar = createPlayer();
 avatar.possess();
-avatar.yaw.position.set(2, 100, 4);
+// avatar.yaw.position.set(2, 100, 4);
+avatar.yaw.position.set(6, 6, 6);
 
-game.appendTo(document.body);
+var tickControls = controls({game: game});
+tickControls.on('hand', function(frame, hand) {
+
+});
+game.on('tick', function(dt) {
+  tickControls.tick(dt);
+});
 
 window.game = game; // for debugging
