@@ -35,38 +35,52 @@ LeapControls.prototype.attachEvents = function() {
   var self = this;
 
   this.controller.on('ready', function() {
-    self.emit.apply(self, 'ready', arguments);
+    var args = [ 'ready' ];
+    args.push.apply(args, arguments);
+    self.emit.apply(self, args);
   });
 
   this.controller.on('connect', function() {
-    self.emit.apply(self, 'connect', arguments);
+    var args = [ 'connect' ];
+    args.push.apply(args, arguments);
+    self.emit.apply(self, args);
   });
 
   this.controller.on('disconnect', function() {
-    self.emit.apply(self, 'disconnect', arguments);
+    var args = [ 'disconnect' ];
+    args.push.apply(args, arguments);
+    self.emit.apply(self, args);
   });
 
   this.controller.on('focus', function() {
-    self.emit.apply(self, 'focus', arguments);
+    var args = [ 'focus' ];
+    args.push.apply(args, arguments);
+    self.emit.apply(self, args);
   });
 
   this.controller.on('blur', function() {
-    self.emit.apply(self, 'blur', arguments);
+    var args = [ 'blur' ];
+    args.push.apply(args, arguments);
+    self.emit.apply(self, args);
   });
 
   this.controller.on('deviceConnected', function() {
-    self.emit.apply(self, 'deviceConnected', arguments);
+    var args = [ 'deviceConnected' ];
+    args.push.apply(args, arguments);
+    self.emit.apply(self, args);
   });
 
   this.controller.on('deviceDisconnected', function() {
-    self.emit.apply(self, 'deviceDisconnected', arguments);
+    var args = [ 'deviceDisconnected' ];
+    args.push.apply(args, arguments);
+    self.emit.apply(self, args);
   });
 };
 
 LeapControls.prototype.tick = function(dt) {
-  var hand, handId, handCount, gesture, gestureId, gestureCount, x, y, z, frame,
-      translation, yTranslation, pointable, pointableId, pointableCount,
-      finger, fingerId, fingerCount;
+  var hand, handId, handCount, gesture, gestureId, gestureCount, frame,
+      pointable, pointableId, pointableCount, finger, fingerId, fingerCount,
+      hands = [], gestures = [], pointables = [], fingers = [];
 
   frame = this.controller.frame();
 
@@ -97,56 +111,34 @@ LeapControls.prototype.tick = function(dt) {
   // recognize hands
   for (handId = 0; handId < handCount; handId++) {
     hand = frame.hands[handId];
-    this.emit('hand', frame, hand, handId);
-    x = hand.palmPosition[0] / frame.interactionBox.width;
-    y = hand.palmPosition[1] / frame.interactionBox.height;
-    z = hand.palmPosition[2] / frame.interactionBox.depth;
-
-    if (z <= -.1) {
-      if (!this.state.forward) {
-        this.state.forward = true;
-        this.game.controls.write({forward: true});
-      }
-      this.game.controls.speed = this.maxSpeed * Math.sin(Math.PI/2 * -(z + .1) / .9);
-      console.log(this.game.controls.speed / this.maxSpeed);
-    } else {
-      if (this.state.forward) {
-        this.state.forward = false;
-        this.game.controls.write({forward: false});
-      }
-    }
-
-    if (this.previousFrame && this.previousFrame.valid) {
-      translation = frame.translation(this.previousFrame);
-      yTranslation = translation[1];
-      if (!this.state.jumping && yTranslation >= this.jumpPrecision) {
-        this.state.jumping = true;
-        this.game.controls.write({jump: true});
-      } else if (this.state.jumping &&
-          (yTranslation <= -this.jumpPrecision / 2)) {
-        this.state.jumping = false;
-        this.game.controls.write({jump: false});
-      }
-    }
+    hands.push(hand);
   }
 
   // recognize fingers
   for (fingerId = 0; fingerId < fingerCount; fingerId++) {
     finger = frame.fingers[fingerId];
-    this.emit('finger', frame, finger, fingerId);
+    fingers.push(finger);
   }
 
   // recognize pointables
   for (pointableId = 0; pointableId < pointableCount; pointableId++) {
     pointable = frame.pointables[pointableId];
-    this.emit('pointable', frame, pointable, pointableId);
+    pointables.push(pointable);
   }
 
   // recognize gesture
   for (gestureId = 0; gestureId < gestureCount; gestureId++) {
     gesture = frame.gestures[gestureId];
-    this.emit('gesture', frame, gesture, gestureId);
+    gestures.push(gesture);
   }
+
+  // Emit a 'tick' event with all the recognized features.
+  this.emit('tick', dt, frame, {
+    hands: hands,
+    fingers: fingers,
+    pointables: pointables,
+    gestures: gestures
+  });
 
   this.previousFrame = frame;
 };
