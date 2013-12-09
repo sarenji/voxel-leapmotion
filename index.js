@@ -1,6 +1,19 @@
 var EventEmitter = require('events').EventEmitter
   , _ = require('underscore');
 
+/**
+ * Constructor function to create a controller class for Voxel.js using the Leap
+ *
+ * Takes an options hash, which is automatically passed to the underlying
+ * Leap.Controller, which hooks into each frame of the Leap motion device.
+ * Leap gesture recognition is enabled by default.
+ *
+ * Additional options include `jumpPrecision`, which defaults to 25. This jump
+ * precision determines the threshold distance your hand should travel upward
+ * in a single frame to trigger a jump in Voxel.js.
+ *
+ * The options hash should also include `game`, a reference to the Voxel.js game
+ */
 function LeapControls(opts) {
   var defaultLeapOptions, key;
 
@@ -8,6 +21,7 @@ function LeapControls(opts) {
     enableGestures: true
   };
 
+  // Merge passed-in options hash with the default options.
   opts.leap = opts.leap || {};
   for (key in defaultLeapOptions) {
     if (!(key in opts.leap)) {
@@ -31,6 +45,10 @@ function LeapControls(opts) {
   this.maxSpeed = this.game.controls.max_speed;
 }
 
+/**
+ * This is an internal function that tells the Leap.Controller class to pass
+ * through events it emits to the higher level LeapControls class.
+ */
 LeapControls.prototype.attachEvents = function() {
   var self = this;
 
@@ -77,6 +95,11 @@ LeapControls.prototype.attachEvents = function() {
   });
 };
 
+/**
+ * `tick` is a function meant to be run every frame in Voxel.js. It takes
+ * information from the Leap, aggregates them, and emits the aggregated
+ * information as a `tick` event.
+ */
 LeapControls.prototype.tick = function(dt) {
   var hand, handId, handCount, gesture, gestureId, gestureCount, frame,
       pointable, pointableId, pointableCount, finger, fingerId, fingerCount,
@@ -143,8 +166,11 @@ LeapControls.prototype.tick = function(dt) {
   this.previousFrame = frame;
 };
 
+// LeapControls inherits from EventEmitter.
 _.extend(LeapControls.prototype, EventEmitter.prototype);
 
+// Now we export a function to automatically create a new instance of
+// LeapControls and pass in some options.
 module.exports = function(opts) {
   var controls = new LeapControls(opts || {});
   return controls;

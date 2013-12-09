@@ -55,6 +55,11 @@ leapControls.on('tick', function(dt, frame, variables) {
     y = hand.palmPosition[1] / frame.interactionBox.height;
     z = hand.palmPosition[2] / frame.interactionBox.depth;
 
+    // Change crosshair position
+    var crosshair = document.getElementById('crosshair')
+    crosshair.style.left = ((x + 1) / 2 * 100) + "%";
+    crosshair.style.top = (100 - (y / 2 * 100)) + "%";
+
     // Forwards movement
     if (z <= -.1) {
       if (!this.state.forward) {
@@ -88,18 +93,20 @@ leapControls.on('tick', function(dt, frame, variables) {
   // Now we need to figure out whether we're grabbing something.
   // This should only work if we're highlighting a block; otherwise
   // we have nothing to grab.
-  if (!this.state.grabbing && fingers.length <= 1 && grabVoxelPosition) {
+  if (!this.state.grabbing && fingers.length <= 1 && grabVoxelPosition && hands.length >= 1) {
     this.state.grabbing = true;
     game.setBlock(grabVoxelPosition, 0);
-  } else if (this.state.grabbing && fingers.length > 1) {
+  } else if (this.state.grabbing && fingers.length >= 4) {
     this.state.grabbing = false;
   }
+
+  if (!window.f) window.f = frame;
 });
 
 highlighter = highlight(game, {
-  // highlightVector: function() {
-  //   return new game.THREE.Vector3(x, y, z)
-  // },
+  highlightVector: function() {
+    return game.cameraVector()
+  },
   animate: true
 })
 
